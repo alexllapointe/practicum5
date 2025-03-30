@@ -5,7 +5,6 @@ server:
     idle-timeout: 15s
   shutdown: graceful
 
-
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
@@ -14,15 +13,19 @@ spring:
   application:
     name: gateway-service
   lifecycle:
-      timeout-per-shutdown-phase: 15s
+    timeout-per-shutdown-phase: 15s
   cloud:
     gateway:
       routes:
         - id: authentication-service
-          uri: ${AUTHENTICATION_SERVICE_URL:http://localhost:4001}/auth
+          uri: ${AUTHENTICATION_SERVICE_URL:http://primes-service:8085}
           predicates:
-            - Path=/auth/**
-        - id: primes-service
-          uri: ${PRIMES_SERVICE_URL:http://localhost:4001}/primes
+            - Path=/authentication-service/**
+          filters:
+            - StripPrefix=1
+        - id: prime-service
+          uri: ${PRIMES_SERVICE_URL:http://primes-service:8085}
           predicates:
-            - Path=/primes/**
+            - Path=/primes-service/primes/**
+          filters:
+            - StripPrefix=1
